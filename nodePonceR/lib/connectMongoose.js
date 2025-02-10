@@ -1,23 +1,17 @@
-
-
+// lib/connectMongoose.js (ESTADO ORIGINAL)
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 
-// Cargar variables de entorno desde .env
-dotenv.config();
+const dbName = 'nodePonceR';
+const connectionString = `mongodb://localhost/${dbName}`;
 
-// Función para conectar a MongoDB
-const connectDB = async () => {
+async function connectMongoose() {
   try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`MongoDB connected: ${mongoose.connection.host}`);
-  } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1); // Termina el proceso si hay un error
+    await mongoose.connect(connectionString);
+    console.log('MongoDB conectado:', mongoose.connection.host);
+  } catch (err) {
+    console.error('Error al conectar a MongoDB:', err.message);
+    throw err;
   }
-};
+}
 
-export default connectDB;
+export default connectMongoose;

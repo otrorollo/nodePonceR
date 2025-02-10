@@ -1,40 +1,37 @@
-import dotenv from 'dotenv'; // Importa dotenv para cargar variables de entorno
-import express from 'express'; // Importa el framework Express para crear aplicaciones web
-import logger from 'morgan'; // Importa el módulo morgan para logging de solicitudes HTTP
+import dotenv from 'dotenv';
+import express from 'express';
+import logger from 'morgan';
+import connectMongoose from './lib/connectMongoose.js';
+import productsController from './controllers/productsController.js';
 
-// Carga las variables de entorno desde .env
 dotenv.config();
 
-// Crea una instancia de la aplicación Express
 const app = express();
 
-// Configuración de la aplicación
-app.set('views', 'views'); // Configura el directorio de vistas
-app.set('view engine', 'ejs'); // Establece EJS como el motor de plantillas
+app.set('views', './views');
+app.set('view engine', 'ejs');
 
-// Middlewares básicos
-app.use(logger('dev')); // Middleware para logging de solicitudes HTTP
-app.use(express.json()); // Middleware para parsear el body que venga en formato JSON
-app.use(express.urlencoded({ extended: false })); // Middleware para parsear el body urlencoded (formularios)
-app.use(express.static('public')); // Middleware para servir archivos estáticos desde la carpeta 'public'
+app.use(logger('dev'));
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.static('public'));
 
-// Ruta básica para probar el servidor
+// Rutas
 app.get('/', (req, res) => {
   res.send('¡Bienvenido a NodePonceR!');
 });
 
-// Middleware para manejar errores 404
+app.get('/api/products', productsController.getProducts);
+
 app.use((req, res, next) => {
   const error = new Error('Ruta no encontrada');
   error.status = 404;
   next(error);
 });
 
-// Middleware para manejar errores generales
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
-  res.send({ error: err.message }); // Respuesta JSON con el mensaje de error
+  res.json({ error: err.message });
 });
 
-// Exporta la instancia de Express como default
 export default app;
